@@ -103,25 +103,14 @@ Page({
         this.setData({ layoutList });
     },
 
-    // 从相册选择照片或拍摄照片
-    chooseImage() {
-        wx.chooseImage({
-            count: 9,
-            sizeType: ['original', 'compressed'],
-            sourceType: ['album', 'camera'],
-
-            success: (res) => {
-                this.showLoading('正在上传图片…');
-
-                console.log(api.getUrl('/upload'));
-                wx.uploadFile({
+    uploadMultiFile(filePaths,successUp,failUp,i,length){
+      wx.uploadFile({
                     url: api.getUrl('/upload'),
-                    filePath: res.tempFilePaths[0],
+                    filePath: filePaths[i],
                     name: 'image',
-
-                    success: (res) => {
-                        let response = JSON.parse(res.data);
-
+                    success: (resp) => {
+                        successUp++;
+                        let response = JSON.parse(resp.data);
                         if (response.code === 0) {
                             console.log(response);
 
@@ -136,15 +125,39 @@ Page({
                             console.log(response);
                         }
                     },
-
                     fail: (res) => {
+                        failUp ++;
                         console.log('fail', res);
                     },
-
                     complete: () => {
-                        this.hideLoading();
+                        i ++;
+                        if(i == length)
+                        {
+                          this.hideLoading();
+                          this.showToast('总共'+successUp+'张上传成功,'+failUp+'张上传失败！');
+                        }
+                        else
+                        {  //递归调用uploadDIY函数
+                            this.uploadMultiFile(filePaths,successUp,failUp,i,length);
+                        }
                     },
                 });
+    },
+    // 从相册选择照片或拍摄照片
+    chooseImage() {
+        wx.chooseImage({
+            count: 9,
+            sizeType: ['original', 'compressed'],
+            sourceType: ['album', 'camera'],
+
+            success: (res) => {
+                this.showLoading('正在上传图片…');
+
+                console.log(api.getUrl('/upload'));
+                var successUp = 0; //成功个数
+                var failUp = 0; //失败个数
+                var length = res.tempFilePaths.length; //总共个数
+                this.uploadMultiFile(res.tempFilePaths,successUp,failUp,0,length);
 
             },
         });
