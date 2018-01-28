@@ -37,6 +37,9 @@ Page({
 
         // 当前预览索引
         previewIndex: 0,
+
+        //文件类型
+        fileType:'',
     },
 
     // 显示loading提示
@@ -91,7 +94,7 @@ Page({
         let layoutList = [];
 
         if (this.data.albumList.length) {
-            layoutList = listToMatrix([0].concat(this.data.albumList), layoutColumnSize);
+            layoutList = listToMatrix([0,0].concat(this.data.albumList), layoutColumnSize);
 
             let lastRow = layoutList[layoutList.length - 1];
             if (lastRow.length < layoutColumnSize) {
@@ -163,6 +166,50 @@ Page({
         });
     },
 
+    // 从相册选择视频或拍摄视频
+    chooseVidio() {
+        wx.chooseVideo({
+            sourceType: ['album', 'camera'],
+            maxDuration: 60,
+            camera: 'back',
+            success: (res) => {
+                this.showLoading('正在上传视频…');
+
+                wx.uploadFile({
+                    url: api.getUrl('/upload'),
+                    filePath: res.tempFilePath,
+                    name: 'image',
+
+                    success: (res) => {
+                        let response = JSON.parse(res.data);
+
+                        if (response.code === 0) {
+                            console.log(response);
+
+                            let albumList = this.data.albumList;
+                            albumList.unshift(response.data.imgUrl);
+
+                            this.setData({ albumList });
+                            this.renderAlbumList();
+
+                            this.showToast('视频上传成功');
+                        } else {
+                            console.log(response);
+                        }
+                    },
+
+                    fail: (res) => {
+                        console.log('fail', res);
+                    },
+
+                    complete: () => {
+                        this.hideLoading();
+                    },
+                });
+
+            },
+        });
+    },
     // 进入预览模式
     enterPreviewMode(event) {
         if (this.data.showActionsSheet) {
@@ -171,8 +218,9 @@ Page({
 
         let imageUrl = event.target.dataset.src;
         let previewIndex = this.data.albumList.indexOf(imageUrl);
+        let extname = imageUrl.toLowerCase().split('.').splice(-1)
 
-        this.setData({ previewMode: true, previewIndex: previewIndex });
+        this.setData({ previewMode: true, previewIndex: previewIndex,fileType: extname[0] });
     },
 
     // 退出预览模式
@@ -180,6 +228,17 @@ Page({
         this.setData({ previewMode: false, previewIndex: 0 });
     },
 
+    // 进入预览模式
+    updatePreviewMode(event) {
+        if (this.data.showActionsSheet) {
+            return;
+        }
+
+        let imageUrl = this.data.albumList[event.detail.current];
+        let extname = imageUrl.toLowerCase().split('.').splice(-1)
+
+        this.setData({ fileType: extname[0] });
+    },
     // 显示可操作命令
     showActions(event) {
         this.setData({ showActionsSheet: true, imageInAction: event.target.dataset.src });

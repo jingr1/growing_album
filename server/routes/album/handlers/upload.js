@@ -30,8 +30,8 @@ class ImageUploader extends RouterBase {
 
                 const buffer = readChunk.sync(imageFile.path, 0, 262);
                 const resultType = fileType(buffer);
-                if (!resultType || !['image/jpeg', 'image/png'].includes(resultType.mime)) {
-                    result.msg = '仅jpg/png格式';
+                if (!resultType || !['image/jpeg', 'image/png','video/mp4'].includes(resultType.mime)) {
+                    result.msg = '仅jpg/png/mp4格式';
                     return;
                 }
 

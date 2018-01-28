@@ -26,7 +26,7 @@ class ListImages extends RouterBase {
                     let extname = String(path.extname(item)).toLowerCase();
 
                     // 只返回`jpg/png`后缀图片
-                    return ['.jpg', '.png'].includes(extname)
+                    return ['.jpg', '.png','.mp4'].includes(extname)
                 }).map(v => config.cosDomain + v),
             });
         });

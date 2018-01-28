@@ -36,6 +36,33 @@
     line-height: 6.66rem;
 }
 
+.upload-vidio {
+    color: #ccc;
+    background: #333;
+    position: absolute;
+    left: 7.56rem;
+    top: 0.2rem;
+    width: 7.26rem;
+    height: 6.66rem;
+    text-align: center;
+    line-height: 6.66rem;
+}
+
+.upload-vidio image {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 2.6rem;
+    top: 1.2rem;
+}
+
+.upload-vidio text {
+    position: absolute;
+    width: 100%;
+    height: 2rem;
+    left: 0;
+    top: 1.6rem;
+}
 .upload-image image {
     position: absolute;
     left: 0;
@@ -62,6 +89,11 @@
 }
 
 .swiper-container image {
+    width: 100%;
+    height: 100%;
+}
+
+.swiper-container video {
     width: 100%;
     height: 100%;
 }

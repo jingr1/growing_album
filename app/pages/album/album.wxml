@@ -2,8 +2,11 @@
     <view class="album-container">
         <view class="item-group" wx:for="{{layoutList}}" wx:for-item="group">
             <block wx:for="{{group}}" wx:for-item="item">
-                <block wx:if="{{item}}">
-                    <image bindtap="enterPreviewMode" bindlongtap="showActions" data-src="{{item}}" class="album-item" src="{{item}}" mode="aspectFill"></image>
+                <block wx:if="{{item.type=='IMAGE'}}">
+                    <image bindtap="enterPreviewMode" bindlongtap="showActions" data-src="{{item.content}}" class="album-item" src="{{item.content}}" mode="aspectFill"></image>
+                </block>
+                <block wx:elif="{{item.type=='VIDIO'}}">
+                    <video bindtap="enterPreviewMode" bindlongtap="showActions"  data-src="{{item.content}}" class="album-item" src="{{item.content}}" controls></video>
                 </block>
                 <block wx:else>
                     <view class="album-item empty"></view>
@@ -15,12 +18,21 @@
         <image src="/images/camera.png" mode="aspectFit"></image>
         <text>上传图片</text>
     </view>
+    <view class="upload-vidio" bindtap="chooseVidio">
+        <image src="/images/camera.png" mode="aspectFit"></image>
+        <text>上传视频</text>
+    </view>
 </scroll-view>
 
-<swiper class="swiper-container" duration="400" current="{{previewIndex}}" bindtap="leavePreviewMode" style="display: {{previewMode ? 'block' : 'none'}};">
+<swiper class="swiper-container" duration="4" circular = 'true' current="{{previewIndex}}"  bindchange="updatePreviewMode" style="display: {{previewMode ? 'block' : 'none'}};">
   <block wx:for="{{albumList}}" wx:for-item="item">
     <swiper-item>
-      <image src="{{item}}" mode="aspectFit"></image>
+      <block wx:if="{{fileType=='mp4'}}">
+        <video src="{{item}}" controls = bindlongpress="leavePreviewMode"></video>
+      </block>
+      <block wx:else>
+        <image src="{{item}}" mode="aspectFit" bindtap="leavePreviewMode"></image>
+      </block>
     </swiper-item>
   </block>
 </swiper>
