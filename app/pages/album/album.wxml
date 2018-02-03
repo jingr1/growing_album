@@ -1,4 +1,4 @@
-<scroll-view class="container" scroll-y="true" style="display: {{!preview ? 'block' : 'none'}};">
+<list-view class="container" scroll-y="true" style="display: {{!preview ? 'block' : 'none'}};">
     <view class="album-container">
         <view class="item-group" wx:for="{{layoutList}}" wx:for-item="group">
             <block wx:for="{{group}}" wx:for-item="item">
@@ -6,7 +6,7 @@
                     <image bindtap="enterPreviewMode" bindlongtap="showActions" data-src="{{item.content}}" class="album-item" src="{{item.content}}" mode="aspectFill"></image>
                 </block>
                 <block wx:elif="{{item.type=='VIDIO'}}">
-                    <video bindtap="enterPreviewMode" bindlongtap="showActions"  data-src="{{item.content}}" class="album-item" src="{{item.content}}" controls></video>
+                    <image bindtap="enterPreviewMode" bindlongtap="showActions"  data-src="{{item.content}}" class="album-item" src="../../images/video.jpg"></image>
                 </block>
                 <block wx:else>
                     <view class="album-item empty"></view>
@@ -22,13 +22,13 @@
         <image src="/images/camera.png" mode="aspectFit"></image>
         <text>上传视频</text>
     </view>
-</scroll-view>
+</list-view>
 
 <swiper class="swiper-container" duration="4" circular = 'true' current="{{previewIndex}}"  bindchange="updatePreviewMode" style="display: {{previewMode ? 'block' : 'none'}};">
   <block wx:for="{{albumList}}" wx:for-item="item">
     <swiper-item>
       <block wx:if="{{fileType=='mp4'}}">
-        <video src="{{item}}" controls = bindlongpress="leavePreviewMode"></video>
+        <video src="{{item}}" controls bindtap="updatePreviewMode" bindlongpress="leavePreviewMode"></video>
       </block>
       <block wx:else>
         <image src="{{item}}" mode="aspectFit" bindtap="leavePreviewMode"></image>

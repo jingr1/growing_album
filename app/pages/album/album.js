@@ -246,35 +246,77 @@ Page({
 
     // 下载图片
     downloadImage() {
-        this.showLoading('正在保存图片…');
         console.log('download_image_url', this.data.imageInAction);
+        let extname = this.data.imageInAction.toLowerCase().split('.').splice(-1)
+        wx.getSetting({
+            success(res) {
+                if (!res.authSetting['scope.writePhotosAlbum']) {
+                    wx.authorize({
+                        scope: 'scope.writePhotosAlbum',
+                        success() {
+                            // 用户已经同意小程序使用录音功能，后续调用 wx.startRecord 接口不会弹窗询问
+                            wx.saveVideoToPhotosAlbum()
+                        }
+                    })
+                }
+            }
+        })
+        if(extname[0] === 'mp4'){
+            this.showLoading('正在保存视频…');
+            wx.downloadFile({
+                url: this.data.imageInAction,
+                type: 'video',
+                success: (resp) => {
+                    wx.saveVideoToPhotosAlbum({
+                        filePath: resp.tempFilePath,
+                        success: (resp) => {
+                            this.showToast('视频保存成功');
+                        },
 
-        wx.downloadFile({
-            url: this.data.imageInAction,
-            type: 'image',
-            success: (resp) => {
-                wx.saveImageToPhotosAlbum({
-                    filePath: resp.tempFilePath,
-                    success: (resp) => {
-                        this.showToast('图片保存成功');
-                    },
+                        fail: (resp) => {
+                            console.log('fail', resp);
+                        },
 
-                    fail: (resp) => {
-                        console.log('fail', resp);
-                    },
+                        complete: (resp) => {
+                            console.log('complete', resp);
+                            this.hideLoading();
+                        },
+                    });
+                },
 
-                    complete: (resp) => {
-                        console.log('complete', resp);
-                        this.hideLoading();
-                    },
-                });
-            },
+                fail: (resp) => {
+                    console.log('fail', resp);
+                },
+            });
+        }
+        else{
+            this.showLoading('正在保存图片…');
+            wx.downloadFile({
+                url: this.data.imageInAction,
+                type: 'image',
+                success: (resp) => {
+                    wx.saveImageToPhotosAlbum({
+                        filePath: resp.tempFilePath,
+                        success: (resp) => {
+                            this.showToast('图片保存成功');
+                        },
 
-            fail: (resp) => {
-                console.log('fail', resp);
-            },
-        });
+                        fail: (resp) => {
+                            console.log('fail', resp);
+                        },
 
+                        complete: (resp) => {
+                            console.log('complete', resp);
+                            this.hideLoading();
+                        },
+                    });
+                },
+
+                fail: (resp) => {
+                    console.log('fail', resp);
+                },
+            });
+        }
         this.setData({ showActionsSheet: false, imageInAction: '' });
     },
 
